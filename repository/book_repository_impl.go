@@ -90,7 +90,7 @@ func (b *BookRepositoryImpl) Update(ctx context.Context, book model.Book) {
 
 	defer helper.CommitOrRollback(tx)
 
-	SQL := "UPDATE book SET name = ?, description = ?, author = ?, image = ? genre = ?, public_date = ? WHERE id = ?"
+	SQL := "UPDATE book SET name = ?, description = ?, author = ?, image = ?, genre = ?, public_date = ? WHERE id = ?"
 	_, err = tx.ExecContext(ctx, SQL, book.Name, book.Description, book.Author, book.Image, book.Genre, book.PublicDate, book.Id)
 	helper.PanicIfError(err)
 }
