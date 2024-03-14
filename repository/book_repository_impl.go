@@ -33,7 +33,7 @@ func (b *BookRepositoryImpl) FindAll(ctx context.Context) []model.Book {
 
 	for result.Next() {
 		book := model.Book{}
-		err := result.Scan(&book.Id, &book.Name)
+		err := result.Scan(&book.Id, &book.Name, &book.Description, &book.Author, &book.Image, &book.Genre, &book.PublicDate)
 		helper.PanicIfError(err)
 
 		books = append(books, book)
@@ -58,7 +58,7 @@ func (b *BookRepositoryImpl) FindById(ctx context.Context, bookId int) (model.Bo
 
 	fmt.Println(result)
 	if result.Next() {
-		err := result.Scan(&book.Id, &book.Name)
+		err := result.Scan(&book.Id, &book.Name, &book.Description, &book.Author, &book.Image, &book.Genre, &book.PublicDate)
 		fmt.Println(err)
 		helper.PanicIfError(err)
 		fmt.Println(book)
@@ -77,9 +77,9 @@ func (b *BookRepositoryImpl) Save(ctx context.Context, book model.Book) {
 
 	fmt.Println(book.Name)
 
-	SQL := "INSERT INTO book (name) VALUES (?)"
-	fmt.Println(SQL, book.Name)
-	_, err = tx.ExecContext(ctx, SQL, book.Name)
+	SQL := "INSERT INTO book (name, description, author, image, genre, public_date) VALUES (?, ?, ?, ?, ?, ?)"
+	fmt.Println(SQL, book.Name, book.Description, book.Author, book.Genre, book.PublicDate)
+	_, err = tx.ExecContext(ctx, SQL, book.Name, book.Description, book.Author, book.Image, book.Genre, book.PublicDate)
 	helper.PanicIfError(err)
 }
 
@@ -90,8 +90,8 @@ func (b *BookRepositoryImpl) Update(ctx context.Context, book model.Book) {
 
 	defer helper.CommitOrRollback(tx)
 
-	SQL := "UPDATE book SET name = ? WHERE id = ?"
-	_, err = tx.ExecContext(ctx, SQL, book.Name, book.Id)
+	SQL := "UPDATE book SET name = ?, description = ?, author = ?, image = ? genre = ?, public_date = ? WHERE id = ?"
+	_, err = tx.ExecContext(ctx, SQL, book.Name, book.Description, book.Author, book.Image, book.Genre, book.PublicDate, book.Id)
 	helper.PanicIfError(err)
 }
 
