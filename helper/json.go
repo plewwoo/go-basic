@@ -14,6 +14,7 @@ func ReadRequestBody(r *http.Request, result interface{}) {
 
 func WriteReponse(write http.ResponseWriter, response interface{}) {
 	write.Header().Add("Content-type", "application/json")
+	write.Header().Add("Access-Control-Allow-Origin", "*")
 	encoder := json.NewEncoder(write)
 	err := encoder.Encode(response)
 	PanicIfError(err)
