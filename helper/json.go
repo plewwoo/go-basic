@@ -1,21 +1,18 @@
 package helper
 
 import (
-	"encoding/json"
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 )
 
-func ReadRequestBody(r *http.Request, result interface{}) {
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(result)
+func ReadRequestBody(ctx *fiber.Ctx, result interface{}) {
+	err := ctx.BodyParser(result)
 	PanicIfError(err)
-
 }
 
-func WriteReponse(write http.ResponseWriter, response interface{}) {
-	write.Header().Add("Content-type", "application/json")
-	write.Header().Add("Access-Control-Allow-Origin", "*")
-	encoder := json.NewEncoder(write)
-	err := encoder.Encode(response)
+func WriteReponse(ctx *fiber.Ctx, response interface{}, status int) error {
+	ctx.Set("Content-type", "application/json")
+	ctx.Set("Access-Control-Allow-Origin", "*")
+	err := ctx.Status(status).JSON(response)
 	PanicIfError(err)
+	return err
 }

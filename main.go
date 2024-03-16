@@ -8,7 +8,6 @@ import (
 	"gobasic/repository"
 	"gobasic/router"
 	"gobasic/service"
-	"net/http"
 )
 
 func main() {
@@ -28,7 +27,6 @@ func main() {
 	//router
 	routes := router.NewRouter(bookController)
 
-	server := http.Server{Addr: "localhost:8000", Handler: routes}
-	err := server.ListenAndServe()
+	err := routes.Listen("localhost:8000")
 	helper.PanicIfError(err)
 }

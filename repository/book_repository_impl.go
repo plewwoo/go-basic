@@ -3,8 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"errors"
-	"fmt"
 	"gobasic/helper"
 	"gobasic/model"
 )
@@ -43,7 +41,7 @@ func (b *BookRepositoryImpl) FindAll(ctx context.Context) []model.Book {
 }
 
 // FindById implements BookRepository.
-func (b *BookRepositoryImpl) FindById(ctx context.Context, bookId int) (model.Book, error) {
+func (b *BookRepositoryImpl) FindById(ctx context.Context, bookId int) (model.Book, interface{}) {
 	tx, err := b.Db.Begin()
 	helper.PanicIfError(err)
 
@@ -56,31 +54,29 @@ func (b *BookRepositoryImpl) FindById(ctx context.Context, bookId int) (model.Bo
 
 	book := model.Book{}
 
-	fmt.Println(result)
 	if result.Next() {
 		err := result.Scan(&book.Id, &book.Name, &book.Description, &book.Author, &book.Image, &book.Genre, &book.PublicDate)
-		fmt.Println(err)
 		helper.PanicIfError(err)
-		fmt.Println(book)
 		return book, nil
 	} else {
-		return book, errors.New("book id not found")
+		return book, map[string]string{"message": "book id not found"}
 	}
 }
 
 // Save implements BookRepository.
-func (b *BookRepositoryImpl) Save(ctx context.Context, book model.Book) {
+func (b *BookRepositoryImpl) Save(ctx context.Context, book model.Book) (model.Book, error) {
 	tx, err := b.Db.Begin()
 	helper.PanicIfError(err)
 
 	defer helper.CommitOrRollback(tx)
 
-	fmt.Println(book.Name)
-
 	SQL := "INSERT INTO book (name, description, author, image, genre, public_date) VALUES (?, ?, ?, ?, ?, ?)"
-	fmt.Println(SQL, book.Name, book.Description, book.Author, book.Genre, book.PublicDate)
-	_, err = tx.ExecContext(ctx, SQL, book.Name, book.Description, book.Author, book.Image, book.Genre, book.PublicDate)
-	helper.PanicIfError(err)
+	result, errExec := tx.ExecContext(ctx, SQL, book.Name, book.Description, book.Author, book.Image, book.Genre, book.PublicDate)
+	helper.PanicIfError(errExec)
+	lastInsertId, lastInsertIdErr := result.LastInsertId()
+	helper.PanicIfError(lastInsertIdErr)
+	book.Id = int(lastInsertId)
+	return book, nil
 }
 
 // Update implements BookRepository.
@@ -91,8 +87,8 @@ func (b *BookRepositoryImpl) Update(ctx context.Context, book model.Book) {
 	defer helper.CommitOrRollback(tx)
 
 	SQL := "UPDATE book SET name = ?, description = ?, author = ?, image = ?, genre = ?, public_date = ? WHERE id = ?"
-	_, err = tx.ExecContext(ctx, SQL, book.Name, book.Description, book.Author, book.Image, book.Genre, book.PublicDate, book.Id)
-	helper.PanicIfError(err)
+	_, errExec := tx.ExecContext(ctx, SQL, book.Name, book.Description, book.Author, book.Image, book.Genre, book.PublicDate, book.Id)
+	helper.PanicIfError(errExec)
 }
 
 // Delete implements BookRepository.

@@ -1,7 +1,9 @@
 package helper
 
-func PanicIfError(err error) {
+import "fmt"
+
+func PanicIfError(err interface{}) {
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 }

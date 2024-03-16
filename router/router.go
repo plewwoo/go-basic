@@ -1,23 +1,21 @@
 package router
 
 import (
-	"fmt"
 	"gobasic/controller"
-	"net/http"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/gofiber/fiber/v2"
 )
 
-func NewRouter(bookController *controller.BookController) *httprouter.Router {
-	router := httprouter.New()
-	router.GET("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		fmt.Fprint(w, "Welcome Home")
+func NewRouter(bookController *controller.BookController) *fiber.App {
+	router := fiber.New()
+	router.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.SendString("Welcome Fiber")
 	})
-	router.GET("/api/book", bookController.FindAll)
-	router.GET("/api/book/:bookId", bookController.FindById)
-	router.POST("/api/book", bookController.Create)
-	router.PUT("/api/book/:bookId", bookController.Update)
-	router.DELETE("/api/book/:bookId", bookController.Delete)
+	router.Get("/api/book", bookController.FindAll)
+	router.Get("/api/book/:bookId", bookController.FindById)
+	router.Post("/api/book", bookController.Create)
+	router.Put("/api/book/:bookId", bookController.Update)
+	router.Delete("/api/book/:bookId", bookController.Delete)
 
 	return router
 }
