@@ -4,10 +4,17 @@ import (
 	"gobasic/controller"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func NewRouter(bookController *controller.BookController) *fiber.App {
 	router := fiber.New()
+	// Middleware
+	router.Use(cors.New())
+	router.Use(logger.New())
+
+	// HTTP Method
 	router.Get("/", func(ctx *fiber.Ctx) error {
 		return ctx.SendString("Welcome Fiber")
 	})
