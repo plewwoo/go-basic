@@ -11,6 +11,7 @@ func ReadRequestBody(ctx *fiber.Ctx, result interface{}) {
 
 func WriteReponse(ctx *fiber.Ctx, response interface{}, status int) error {
 	ctx.Set("Content-type", "application/json")
+	ctx.Set("Access-Control-Allow-Origin", "*")
 	err := ctx.Status(status).JSON(response)
 	PanicIfError(err)
 	return err
